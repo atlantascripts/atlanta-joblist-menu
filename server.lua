@@ -13,11 +13,11 @@ ESX = exports['es_extended']:getSharedObject()
 
 Shared = Shared or {}
 
-ESX.RegisterServerCallback('getAllJobsWithPlayerCounts', function(source, cb)
+ESX.RegisterServerCallback('getJobs', function(source, cb)
     MySQL.Async.fetchAll('SELECT * FROM jobs', {}, function(jobs)
         local jobCounts = {}
 
-        for i=1, #jobs, 1 do
+        for i = 1, #jobs, 1 do
             if not contains(Shared.ExcludedJobs, jobs[i].name) then
                 jobCounts[jobs[i].name] = {
                     label = jobs[i].label,
@@ -27,7 +27,7 @@ ESX.RegisterServerCallback('getAllJobsWithPlayerCounts', function(source, cb)
         end
 
         local players = ESX.GetPlayers()
-        for i=1, #players, 1 do
+        for i = 1, #players, 1 do
             local xPlayer = ESX.GetPlayerFromId(players[i])
             local jobName = xPlayer.job.name
 
@@ -49,6 +49,24 @@ ESX.RegisterServerCallback('getAllJobsWithPlayerCounts', function(source, cb)
 
         cb(jobList)
     end)
+end)
+
+ESX.RegisterServerCallback('getPlayers', function(source, cb, jobName)
+    local players = ESX.GetPlayers()
+    local playerData = {}
+
+    for i = 1, #players, 1 do
+        local xPlayer = ESX.GetPlayerFromId(players[i])
+        if xPlayer.job.name == jobName then
+            local playerName = Shared.ShowSteamName and GetPlayerName(players[i]) or xPlayer.getName()
+            table.insert(playerData, {
+                id = xPlayer.source,
+                name = playerName
+            })
+        end
+    end
+
+    cb(playerData)
 end)
 
 function contains(table, val)

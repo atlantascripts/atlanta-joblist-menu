@@ -25,7 +25,7 @@ function openJobListing()
     if Shared.Debug then
         print("[ATLANTA SCRIPTS] Generating menu options...")
     end
-    ESX.TriggerServerCallback('getAllJobsWithPlayerCounts', function(jobData)
+    ESX.TriggerServerCallback('getJobs', function(jobData)
         local options = {}
 
         for _, job in pairs(jobData) do
@@ -33,6 +33,8 @@ function openJobListing()
             local displayText = string.format('%s %s: %d %s', emoji, job.label, job.count, Shared.Translation['ONLINE'])
             table.insert(options, {
                 title = displayText,
+                event = Shared.ShowPlayers and 'jobList:showPlayers' or nil, 
+                args = Shared.ShowPlayers and { jobName = job.name, jobLabel = job.label } or nil
             })
         end
 
@@ -51,3 +53,34 @@ function openJobListing()
         end
     end)
 end
+
+RegisterNetEvent('jobList:showPlayers')
+AddEventHandler('jobList:showPlayers', function(data)
+    ESX.TriggerServerCallback('getPlayers', function(playerData)
+        local options = {}
+
+        for _, playerInfo in ipairs(playerData) do
+            local playerName = playerInfo.name
+            if Shared.ShowID then
+                playerName = playerName .. ' (' .. playerInfo.id .. ' ID)'
+            end
+            table.insert(options, {
+                title = playerName
+            })
+        end
+
+        lib.registerContext({
+            id = 'playerlist',
+            title = data.jobLabel .. " " .. Shared.Translation['PLAYERS'],
+            menu = 'playerlist',
+            options = options
+        })
+
+        lib.showContext('playerlist')
+
+        if Shared.Debug then
+            Wait(10)
+            print("[ATLANTA SCRIPTS] Player list loaded...")
+        end
+    end, data.jobName)
+end)
