@@ -12,9 +12,9 @@ Shared = {}
 
 Shared.Debug = false  -- Enable or disable debug mode
 
-Shared.ShowPlayers = true
-Shared.ShowSteamName = true
-Shared.ShowID = true
+Shared.ShowPlayers = true -- Show a player list if you click on the job
+Shared.ShowSteamName = true -- Show steam name in the player list
+Shared.ShowID = true -- Show ID in the player list
 
 Shared.OpenMenuCommand = "joblist"                      -- The command to open the menu
 Shared.OpenButton = "J"                                 -- The button to open everywhere the menu
